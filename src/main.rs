@@ -1,17 +1,18 @@
 // Seed: 3249224983 (this is just one in the chain)
 // cycle length: 1708724
 fn main() {
-    let mut rng = RngContext {state: 3249224983};
-    let mut last_state = 3249224983;
-    // let mut holePossibilities = Vec::new();
-    for _i in 0..10 {
-        rng.set_state(last_state);
-        last_state = rng.next_u32();
-        let test = HoleMinigame::generate(&mut rng);
-        test.draw();
-        println!();
-        // holePossibilities.push(test);
-    }
+    let mut rng = RngContext {state: 0x945B4001};
+    HoleMinigame::generate(&mut rng,HoleMinigameDifficulty::Intermediate).draw();
+    // let mut last_state = 3249224983;
+    // // let mut holePossibilities = Vec::new();
+    // for _i in 0..10 {
+    //     rng.set_state(last_state);
+    //     last_state = rng.next_u32();
+    //     let test = HoleMinigame::generate(&mut rng);
+    //     test.draw();
+    //     println!();
+    //     // holePossibilities.push(test);
+    // }
     // let mut bomb_totals = [0; 20];
     // for game in holePossibilities.iter() {
     //     for i in 0..20 {
@@ -90,16 +91,42 @@ struct HoleMinigame {
     recursion_depth: u8,
 }
 
+enum HoleMinigameDifficulty {
+    Beginner,
+    Intermediate,
+    Expert,
+}
+
 impl HoleMinigame {
-    fn generate(rng: &mut RngContext) -> Self {
-        let mut this = HoleMinigame{
-            hole_count: 20,
-            board_height: 4,
-            board_width: 5,
-            rupoor_count: 0,
-            bomb_count: 4,
-            holes: [HoleContent::Unspecified; 40],
-            recursion_depth: 0,
+    fn generate(rng: &mut RngContext, difficulty: HoleMinigameDifficulty) -> Self {
+        let mut this = match difficulty {
+            HoleMinigameDifficulty::Beginner =>  HoleMinigame{
+                    hole_count: 20,
+                    board_height: 4,
+                    board_width: 5,
+                    rupoor_count: 0,
+                    bomb_count: 4,
+                    holes: [HoleContent::Unspecified; 40],
+                    recursion_depth: 0,
+                },
+            HoleMinigameDifficulty::Intermediate => HoleMinigame{
+                    hole_count: 30,
+                    board_height: 5,
+                    board_width: 6,
+                    rupoor_count: 4,
+                    bomb_count: 4,
+                    holes: [HoleContent::Unspecified; 40],
+                    recursion_depth: 0,
+                },
+            HoleMinigameDifficulty::Expert => HoleMinigame{
+                    hole_count: 40,
+                    board_height: 5,
+                    board_width: 8,
+                    rupoor_count: 8,
+                    bomb_count: 8,
+                    holes: [HoleContent::Unspecified; 40],
+                    recursion_depth: 0,
+                }
         };
         this.try_place(rng);
         return this;
