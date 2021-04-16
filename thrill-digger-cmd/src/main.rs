@@ -1,30 +1,12 @@
-use std::error::Error;
-use std::collections::{HashSet, HashMap};
-use std::time;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::{BufWriter, BufReader};
-use std::path::Path;
-use std::io::{self, Read};
-
-#[macro_use]
-extern crate num_derive;
-
+extern crate ss_rng;
 extern crate num_traits;
 
-use num_traits::FromPrimitive;
+use num_traits::cast::FromPrimitive;
+use std::io::{self, Read};
 
-pub mod experiments;
-use crate::experiments::*;
-
-pub mod rng;
-use crate::rng::*;
-
-pub mod thrill_digger;
-use crate::thrill_digger::*;
-
-pub mod solver;
-use crate::solver::*;
+use ss_rng::solver::*;
+use ss_rng::rng::*;
+use ss_rng::thrill_digger::*;
 
 fn main() {
     // println!("{}", get_loop_value_belongs_to(2613080473, &get_all_loops_and_members()));

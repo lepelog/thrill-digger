@@ -1,0 +1,12 @@
+[package]
+name = "thrill-digger-cmd"
+version = "0.1.0"
+authors = ["lepelog <lepelog@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ss-rng = {path = "../thrill-digger-lib"}
+num-traits = "0.2"
+num-derive = "0.3"
