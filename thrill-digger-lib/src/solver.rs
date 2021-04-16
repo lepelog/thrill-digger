@@ -50,9 +50,6 @@ impl ThrillDiggerBoardSolver {
         let mut hole_minigame = HoleMinigame::new(&self.current_difficulty);
         for (rng_loop_idx, &(seed, period)) in ALL_RNG_LOOPS.iter().filter(|(_, period)| *period > 8).enumerate() {
             let mut rng = RngContext::from_state(seed);
-            if rng_loop_idx > 0 {
-                break;
-            }
             for _ in 0..period {
                 hole_minigame.regenerate(&mut rng.clone());
                 if hole_minigame.check_equals(&self.current_board_state) {

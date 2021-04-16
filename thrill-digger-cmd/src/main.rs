@@ -1,6 +1,8 @@
 extern crate ss_rng;
 extern crate num_traits;
 
+use std::time;
+
 use num_traits::cast::FromPrimitive;
 use std::io::{self, Read};
 
@@ -32,10 +34,10 @@ fn test_solver() {
     // solver.set_hole(17, HoleContent::Bomb);
     // let last_matching_seed = solver.calculate_probabilities();
     // println!("{}", solver.probability_string());
-    // let old_time = time::SystemTime::now();
+    let old_time = time::SystemTime::now();
     let boards = get_all_possible_boards(&HoleMinigameDifficulty::Expert);
-    // let duration = old_time.elapsed().unwrap();
-    // println!("took {}ms", duration.as_millis());
+    let duration = old_time.elapsed().unwrap();
+    println!("took {}ms", duration.as_millis());
     'outloop: loop {
         println!("input '{{hole number}} {{content}}'");
         let mut input = String::new();

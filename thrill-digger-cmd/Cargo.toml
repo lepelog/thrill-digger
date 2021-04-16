@@ -10,3 +10,6 @@ edition = "2018"
 ss-rng = {path = "../thrill-digger-lib"}
 num-traits = "0.2"
 num-derive = "0.3"
+
+[profile.release]
+lto = true

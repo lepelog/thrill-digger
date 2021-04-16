@@ -52,7 +52,6 @@ impl SolverWrapper {
     #[wasm_bindgen]
     pub fn cache_boards(&mut self) {
         self.cached_boards.clear();
-        // 1580047903,1708724
         for &(seed, period) in ALL_RNG_LOOPS.iter().filter(|(_, period)| *period > 8) {
             let mut current_boards = vec![[HoleContent::Unspecified; 40]; period as usize];
             let mut rng = RngContext::from_state(seed);
