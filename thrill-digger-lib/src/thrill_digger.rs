@@ -84,6 +84,19 @@ impl HoleMinigameDifficulty {
 
 impl HoleMinigame {
     pub fn generate(rng: &mut RngContext, difficulty: HoleMinigameDifficulty) -> Self {
+        // let mut this = match difficulty {
+        //     HoleMinigameDifficulty::Beginner => 
+        //         HoleMinigame {
+        //             hole_count: 5 * 4,
+        //             board_height: 4,
+        //             board_width: 5,
+        //             rupoor_count: 0,
+        //             bomb_count: 4,
+        //             holes: [HoleContent::Unspecified; 40],
+        //             recursion_depth: 0,
+        //         },
+        //     _ => panic!("TODO"),
+        // };
         let mut this =  HoleMinigame{
                     hole_count: difficulty.get_hole_count(),
                     board_height: difficulty.get_board_height(),
@@ -95,6 +108,22 @@ impl HoleMinigame {
                 };
         this.try_place(rng);
         return this;
+    }
+
+    pub fn new(difficulty: &HoleMinigameDifficulty) -> Self {
+        HoleMinigame {
+            hole_count: difficulty.get_hole_count(),
+            board_height: difficulty.get_board_height(),
+            board_width: difficulty.get_board_width(),
+            rupoor_count: difficulty.get_rupoor_count(),
+            bomb_count: difficulty.get_bomb_count(),
+            holes: [HoleContent::Unspecified; 40],
+            recursion_depth: 0,
+        }
+    }
+
+    pub fn regenerate(&mut self, rng: &mut RngContext) {
+        self.try_place(rng);
     }
 
     fn try_place(&mut self, rng: &mut RngContext) {
@@ -200,6 +229,7 @@ impl HoleMinigame {
         }
     }
 
+    #[inline]
     fn is_bomb_or_rupoor(&mut self, index: isize) -> bool {
         if (-1 < index) && (index < self.hole_count) {
             let content = &self.holes[index as usize];

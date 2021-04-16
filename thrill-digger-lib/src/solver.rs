@@ -1,5 +1,4 @@
 use std::fmt::Write;
-use std::time;
 
 use crate::rng::*;
 use crate::thrill_digger::*;
@@ -46,20 +45,21 @@ impl ThrillDiggerBoardSolver {
     pub fn calculate_probabilities(&mut self) -> u32 {
         let mut matching_count = 0;
         let mut bomb_counts = vec![0; self.current_difficulty.get_hole_count() as usize];
-        let start_time = time::SystemTime::now();
-        let mut iterations = 0;
         let mut last_matching_seed = 0;
         let mut last_matching_loop_idx = 0;
+        let mut hole_minigame = HoleMinigame::new(&self.current_difficulty);
         for (rng_loop_idx, &(seed, period)) in ALL_RNG_LOOPS.iter().filter(|(_, period)| *period > 8).enumerate() {
             let mut rng = RngContext::from_state(seed);
+            if rng_loop_idx > 0 {
+                break;
+            }
             for _ in 0..period {
-                iterations += 1;
-                let current_board = HoleMinigame::generate(&mut rng.clone(), self.current_difficulty);
-                if current_board.check_equals(&self.current_board_state) {
+                hole_minigame.regenerate(&mut rng.clone());
+                if hole_minigame.check_equals(&self.current_board_state) {
                     last_matching_seed = seed;
                     last_matching_loop_idx = rng_loop_idx;
                     matching_count += 1;
-                    for (i, hole_content) in current_board.get_holes().iter().enumerate() {
+                    for (i, hole_content) in hole_minigame.get_holes().iter().enumerate() {
                         if *hole_content == HoleContent::Bomb {
                             bomb_counts[i] += 1;
                         }
@@ -71,10 +71,14 @@ impl ThrillDiggerBoardSolver {
         if matching_count == 1 {
             self.identified_loop = Some(last_matching_loop_idx);
         }
-        let time_taken = time::SystemTime::now().duration_since(start_time).unwrap();
-        println!("Took {}ms for {} iterations, thats {}ms for one", time_taken.as_millis(), iterations, (time_taken.as_millis() as f32/iterations as f32));
-        for i in 0..self.current_difficulty.get_hole_count() as usize {
-            self.bomb_probabilities[i] = bomb_counts[i] as f32 / matching_count as f32;
+        if matching_count >= 1 {
+            for i in 0..self.current_difficulty.get_hole_count() as usize {
+                self.bomb_probabilities[i] = bomb_counts[i] as f32 / matching_count as f32;
+            }
+        } else {
+            for bomb_prob in self.bomb_probabilities.iter_mut() {
+                *bomb_prob = f32::NAN;
+            }
         }
         return last_matching_seed;
     }
@@ -82,12 +86,9 @@ impl ThrillDiggerBoardSolver {
     pub fn calculate_probabilities_with_pregenerated(&mut self, boards: &Vec<Vec<[HoleContent; 40]>>) {
         let mut matching_count = 0;
         let mut bomb_counts = vec![0; self.current_difficulty.get_hole_count() as usize];
-        let start_time = time::SystemTime::now();
-        let mut iterations = 0;
         let mut last_matching_loop_idx = 0;
         for (rng_loop_idx, loop_boards) in boards.iter().enumerate() {
             for board in loop_boards.iter() {
-                iterations += 1;
                 if board.iter().zip(&self.current_board_state).all(|(is, should)| *should == HoleContent::Unspecified || is == should) {
                     last_matching_loop_idx = rng_loop_idx;
                     matching_count += 1;
@@ -102,8 +103,6 @@ impl ThrillDiggerBoardSolver {
         if matching_count == 1 {
             self.identified_loop = Some(last_matching_loop_idx);
         }
-        let time_taken = time::SystemTime::now().duration_since(start_time).unwrap();
-        println!("Took {}ms for {} iterations, thats {}ms for one", time_taken.as_millis(), iterations, (time_taken.as_millis() as f32/iterations as f32));
         for i in 0..self.current_difficulty.get_hole_count() as usize {
             self.bomb_probabilities[i] = bomb_counts[i] as f32 / matching_count as f32;
         }
@@ -125,9 +124,9 @@ impl ThrillDiggerBoardSolver {
         let mut out = String::new();
         for i in 0..self.current_difficulty.get_board_height() {
             for j in 0..self.current_difficulty.get_board_width() {
-                write!(out, "   {}  ", self.current_board_state[(i * self.current_difficulty.get_board_width() + j) as usize].draw());
+                write!(out, "   {}  ", self.current_board_state[(i * self.current_difficulty.get_board_width() + j) as usize].draw()).unwrap();
             }
-            writeln!(out);
+            writeln!(out).unwrap();
         }
         out
     }
@@ -138,5 +137,9 @@ impl ThrillDiggerBoardSolver {
 
     pub fn get_identified_loop(&self) -> Option<usize> {
         self.identified_loop
+    }
+
+    pub fn get_difficulty(&self) -> &HoleMinigameDifficulty {
+        &self.current_difficulty
     }
 }
