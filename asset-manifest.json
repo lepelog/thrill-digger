@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/thrill-digger/static/css/main.0670abdb.chunk.css",
+    "main.js": "/thrill-digger/static/js/main.983ae626.chunk.js",
+    "main.js.map": "/thrill-digger/static/js/main.983ae626.chunk.js.map",
+    "runtime-main.js": "/thrill-digger/static/js/runtime-main.a04c4f84.js",
+    "runtime-main.js.map": "/thrill-digger/static/js/runtime-main.a04c4f84.js.map",
+    "static/js/2.2ca65203.chunk.js": "/thrill-digger/static/js/2.2ca65203.chunk.js",
+    "static/js/2.2ca65203.chunk.js.map": "/thrill-digger/static/js/2.2ca65203.chunk.js.map",
+    "static/js/3.5ab6b00b.chunk.js": "/thrill-digger/static/js/3.5ab6b00b.chunk.js",
+    "613a0da170b0cee530a8.module.wasm": "/thrill-digger/613a0da170b0cee530a8.module.wasm",
+    "static/js/3.5ab6b00b.chunk.js.map": "/thrill-digger/static/js/3.5ab6b00b.chunk.js.map",
+    "static/js/4.6d42f71f.chunk.js": "/thrill-digger/static/js/4.6d42f71f.chunk.js",
+    "static/js/4.6d42f71f.chunk.js.map": "/thrill-digger/static/js/4.6d42f71f.chunk.js.map",
+    "index.html": "/thrill-digger/index.html",
+    "static/css/main.0670abdb.chunk.css.map": "/thrill-digger/static/css/main.0670abdb.chunk.css.map",
+    "static/js/2.2ca65203.chunk.js.LICENSE.txt": "/thrill-digger/static/js/2.2ca65203.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.a04c4f84.js",
+    "static/js/2.2ca65203.chunk.js",
+    "static/css/main.0670abdb.chunk.css",
+    "static/js/main.983ae626.chunk.js"
+  ]
+}
