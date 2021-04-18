@@ -84,19 +84,6 @@ impl HoleMinigameDifficulty {
 
 impl HoleMinigame {
     pub fn generate(rng: &mut RngContext, difficulty: HoleMinigameDifficulty) -> Self {
-        // let mut this = match difficulty {
-        //     HoleMinigameDifficulty::Beginner => 
-        //         HoleMinigame {
-        //             hole_count: 5 * 4,
-        //             board_height: 4,
-        //             board_width: 5,
-        //             rupoor_count: 0,
-        //             bomb_count: 4,
-        //             holes: [HoleContent::Unspecified; 40],
-        //             recursion_depth: 0,
-        //         },
-        //     _ => panic!("TODO"),
-        // };
         let mut this =  HoleMinigame{
                     hole_count: difficulty.get_hole_count(),
                     board_height: difficulty.get_board_height(),

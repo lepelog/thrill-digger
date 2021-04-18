@@ -51,7 +51,7 @@ export class GridField extends React.Component<GridFieldProps, {}> {
 
     render() {
       const {bombProbability, index, selectedState, ranking} = this.props;
-      const bgColor = goodnessInterpolation(bombProbability === NaN ? 0 : bombProbability);
+      const bgColor = selectedState === HoleContent.Unspecified ? goodnessInterpolation(isFinite(bombProbability) ? bombProbability : 0) : "unset";
       return (
         <div className="grid-field" style={{backgroundColor: bgColor, borderColor: ranking < 3 ? "#0011d3": "black"}}>
           <div>hole: {index}, probability: {(bombProbability * 100).toFixed(2)}%</div>

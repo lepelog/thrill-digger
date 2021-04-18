@@ -61,6 +61,7 @@ class TestComp extends React.Component<{}, AppState> {
           boardHeight,
           cellStates: newStates,
         });
+        this.updateBoardAndRecalculateProbs(newStates);
       });
     });
   }
@@ -69,14 +70,24 @@ class TestComp extends React.Component<{}, AppState> {
     this.state.solver?.free();
   }
 
-  selectedChanged(index: number, selection: HoleContent) {
-    const cellStates = this.state.cellStates;
-    cellStates[index].selectedType = selection;
+  getSolverOrError(): SolverWrapper {
     if (this.state.solver === null) {
       throw Error("solver is null!");
     }
-    const solver = this.state.solver;
+    return this.state.solver;
+  }
+
+  selectedChanged(index: number, selection: HoleContent) {
+    const cellStates = this.state.cellStates;
+    cellStates[index].selectedType = selection;
+    const solver = this.getSolverOrError();
     solver.set_hole(index, selection);
+    this.updateBoardAndRecalculateProbs(cellStates);
+  }
+
+  // calculate the new probabilites and sets the cellStates to the state at the end
+  updateBoardAndRecalculateProbs(cellStates: FieldState[]) {
+    const solver = this.getSolverOrError();
     solver.calculate_probabilities_with_pregenerated();
     cellStates.forEach((cellState, index) => {
       cellState.bombPercentage = solver.get_probability(index);
@@ -87,6 +98,12 @@ class TestComp extends React.Component<{}, AppState> {
       .map((fieldState, index) => [index, fieldState]);
     cellStatesWithIndex.sort((a,b) => a[1].bombPercentage - b[1].bombPercentage);
     cellStatesWithIndex.forEach(([_, fieldState], index) => fieldState.ranking = index);
+    // make all cells, that are already dug up have no ranking
+    cellStates.forEach(cs => {
+      if (cs.selectedType !== HoleContent.Unspecified) {
+        cs.ranking = 100;
+      }
+    });
     this.setState({
       cellStates,
     });
@@ -102,9 +119,11 @@ class TestComp extends React.Component<{}, AppState> {
         ranking: 100,
       }
     });
-    this.setState({
-      cellStates,
-    });
+    const solver = this.getSolverOrError();
+    for (let i = 0;i < boardHeight * boardWidth;i++) {
+      solver.set_hole(i, HoleContent.Unspecified);
+    }
+    this.updateBoardAndRecalculateProbs(cellStates);
   }
 
   render() {
