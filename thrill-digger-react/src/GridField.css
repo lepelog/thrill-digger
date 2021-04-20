@@ -6,3 +6,7 @@
     border: 1px solid black;
     margin: 2px;
 }
+
+.content-image-highlighted {
+    background: gray;
+}

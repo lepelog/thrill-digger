@@ -48,21 +48,10 @@ const holeStates = [
 const goodnessInterpolation = interpolate(['#2de500', '#e5d200', '#e50b00']);
 
 export class GridField extends React.Component<GridFieldProps, {}> {
-    onSelectChanges: any[];
     contentImages: string[];
 
     constructor(props: GridFieldProps) {
         super(props);
-
-        this.onSelectChanges = [];
-        this.onSelectChanges[0] = this.onSelectChange.bind(this, 0);
-        this.onSelectChanges[1] = this.onSelectChange.bind(this, 1);
-        this.onSelectChanges[2] = this.onSelectChange.bind(this, 2);
-        this.onSelectChanges[3] = this.onSelectChange.bind(this, 3);
-        this.onSelectChanges[4] = this.onSelectChange.bind(this, 4);
-        this.onSelectChanges[5] = this.onSelectChange.bind(this, 5);
-        this.onSelectChanges[6] = this.onSelectChange.bind(this, 6);
-        this.onSelectChanges[7] = this.onSelectChange.bind(this, 7);
         this.contentImages = [
           unspecified,
           greenRupee,
@@ -89,7 +78,7 @@ export class GridField extends React.Component<GridFieldProps, {}> {
           <div>
               {holeStates.map((h, index) => {
                   return (
-                    <img className="content-image" src={this.contentImages[index]} alt={holeContentToStr(h)} onClick={this.onSelectChanges[index]} width={20} />
+                    <img key={index} className={(index === selectedState ? "content-image-highlighted " : "") + "content-image"} src={this.contentImages[index]} alt={holeContentToStr(h)} onClick={this.onSelectChange.bind(this, index)} width={20} />
                   );
               })}
           </div>
