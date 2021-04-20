@@ -19,6 +19,7 @@ function holeContentToStr(hc: HoleContent): string {
 
 type GridFieldProps = {
     bombProbability: number,
+    rupoorProbability: number,
     selectedState: HoleContent,
     index: number,
     selectionChangedCallback: (index: number, newSelected: HoleContent) => void,
@@ -50,11 +51,12 @@ export class GridField extends React.Component<GridFieldProps, {}> {
     }
 
     render() {
-      const {bombProbability, index, selectedState, ranking} = this.props;
+      const {bombProbability, rupoorProbability, selectedState, ranking} = this.props;
       const bgColor = selectedState === HoleContent.Unspecified ? goodnessInterpolation(isFinite(bombProbability) ? bombProbability : 0) : "unset";
       return (
         <div className="grid-field" style={{backgroundColor: bgColor, borderColor: ranking < 3 ? "#0011d3": "black"}}>
-          <div>hole: {index}, probability: {(bombProbability * 100).toFixed(2)}%</div>
+          <div>bomb probability: {(bombProbability * 100).toFixed(2)}%</div>
+          <div>rupoor probability: {(rupoorProbability * 100).toFixed(2)}%</div>
           <div>
             <select onChange={this.onSelectChange} value={selectedState}>
                 {holeStates.map(h => {
