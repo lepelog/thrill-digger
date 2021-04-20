@@ -1,4 +1,5 @@
 # Thrill Digger solver (Expert)
+The online version can be found on [GitHub Pages](https://lepelog.github.io/thrill-digger/). It uses 100MB of RAM (to store all possible boards) and it takes a few seconds to initialize
 ## Why expert?
 Expert has the most entropy for generating boards, the amount of possible seeds is
 significantly lower that the amount of valid expert boards, making it possible to predict bomb positions more accurately
