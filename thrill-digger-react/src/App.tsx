@@ -4,8 +4,9 @@ import './App.css';
 import { SolverWrapper } from "./native/build";
 import { GridField, HoleContent } from "./GridField";
 
-type FieldState = {
+type CellState = {
   bombPercentage: number,
+  rupoorPercentage: number,
   selectedType: HoleContent,
   ranking: number,
 };
@@ -14,9 +15,11 @@ type AppState = {
   nativeModule: any,
   currentMessage: string,
   solver: SolverWrapper | null,
-  cellStates: FieldState[],
+  cellStates: CellState[],
   boardWidth: number,
   boardHeight: number,
+  identifiedLoop: number | undefined,
+  matchingSeedCount: number,
 };
 
 class TestComp extends React.Component<{}, AppState> {
@@ -27,9 +30,11 @@ class TestComp extends React.Component<{}, AppState> {
       nativeModule: null,
       currentMessage: "waiting to initialize...",
       solver: null,
-      cellStates: [{bombPercentage: 0, selectedType: HoleContent.Unspecified, ranking: 100}],
+      cellStates: [{bombPercentage: 0, rupoorPercentage: 0, selectedType: HoleContent.Unspecified, ranking: 100}],
       boardHeight: 0,
       boardWidth: 0,
+      identifiedLoop: undefined,
+      matchingSeedCount: -1,
     };
 
     this.selectedChanged = this.selectedChanged.bind(this);
@@ -46,11 +51,13 @@ class TestComp extends React.Component<{}, AppState> {
         console.log("setting state");
         // this takes a really long time
         this.state.solver?.cache_boards();
+        // this.state.solver?.lock_to_loop(0);
         const boardHeight = this.state.solver!.get_height();
         const boardWidth = this.state.solver!.get_width();
         const newStates = Array(boardHeight * boardWidth).fill(0).map(() => {
           return {
             bombPercentage: 0,
+            rupoorPercentage: 0,
             selectedType: HoleContent.Unspecified,
             ranking: 100,
           }
@@ -86,18 +93,21 @@ class TestComp extends React.Component<{}, AppState> {
   }
 
   // calculate the new probabilites and sets the cellStates to the state at the end
-  updateBoardAndRecalculateProbs(cellStates: FieldState[]) {
+  updateBoardAndRecalculateProbs(cellStates: CellState[]) {
     const solver = this.getSolverOrError();
     solver.calculate_probabilities_with_pregenerated();
     cellStates.forEach((cellState, index) => {
       cellState.bombPercentage = solver.get_probability(index);
+      // cellState.rupoorPercentage = solver.get_rupoor_probability(index);
+      cellState.rupoorPercentage = solver.get_rupoor_probability(index);
     });
     // figure out the best places for the ranking, don't include already placed
-    const cellStatesWithIndex: [number, FieldState][] = cellStates
+    const cellStatesWithIndex: [number, CellState][] = cellStates
       .filter(cs => cs.selectedType === HoleContent.Unspecified)
-      .map((fieldState, index) => [index, fieldState]);
-    cellStatesWithIndex.sort((a,b) => a[1].bombPercentage - b[1].bombPercentage);
-    cellStatesWithIndex.forEach(([_, fieldState], index) => fieldState.ranking = index);
+      .map((CellState, index) => [index, CellState]);
+    // first sort by bomb probability, then by rupoor probability
+    cellStatesWithIndex.sort((a,b) => a[1].bombPercentage - b[1].bombPercentage || a[1].rupoorPercentage - b[1].rupoorPercentage);
+    cellStatesWithIndex.forEach(([_, CellState], index) => CellState.ranking = index);
     // make all cells, that are already dug up have no ranking
     cellStates.forEach(cs => {
       if (cs.selectedType !== HoleContent.Unspecified) {
@@ -106,6 +116,8 @@ class TestComp extends React.Component<{}, AppState> {
     });
     this.setState({
       cellStates,
+      matchingSeedCount: solver.get_possible_rng_values_count(),
+      identifiedLoop: solver.get_identified_loop(),
     });
   }
 
@@ -115,6 +127,7 @@ class TestComp extends React.Component<{}, AppState> {
     const cellStates = Array(boardHeight * boardWidth).fill(0).map(() => {
       return {
         bombPercentage: 0,
+        rupoorPercentage: 0,
         selectedType: HoleContent.Unspecified,
         ranking: 100,
       }
@@ -127,11 +140,13 @@ class TestComp extends React.Component<{}, AppState> {
   }
 
   render() {
-    const {boardHeight, boardWidth, cellStates, currentMessage} = this.state;
+    const {boardHeight, boardWidth, cellStates, currentMessage, matchingSeedCount, identifiedLoop} = this.state;
     return (
       <div className="App">
       <h1>Thrill Digger Expert solver</h1>
         <div>{currentMessage}</div>
+        <div>matching seeds: {matchingSeedCount}</div>
+        <div>identified loop: {identifiedLoop}</div>
         <table>
           <tbody>
             {
@@ -144,6 +159,7 @@ class TestComp extends React.Component<{}, AppState> {
                       return (<td><GridField
                         key={index}
                         bombProbability={cellState.bombPercentage}
+                        rupoorProbability={cellState.rupoorPercentage}
                         selectedState={cellState.selectedType}
                         index={index}
                         selectionChangedCallback={this.selectedChanged}

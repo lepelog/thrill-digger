@@ -34,11 +34,12 @@ impl SolverWrapper {
         Ok(())
     }
 
-    #[wasm_bindgen]
-    pub fn calculate_probabilities(&mut self) {
-        self.inner.calculate_probabilities();
-    }
+    // #[wasm_bindgen]
+    // pub fn calculate_probabilities(&mut self) {
+    //     self.inner.calculate_probabilities();
+    // }
 
+    #[wasm_bindgen]
     pub fn calculate_probabilities_with_pregenerated(&mut self) {
         self.inner.calculate_probabilities_with_pregenerated(&self.cached_boards)
     }
@@ -46,6 +47,31 @@ impl SolverWrapper {
     #[wasm_bindgen]
     pub fn get_probability(&self, slot: u32) -> f32 {
         self.inner.get_bomb_probability(slot as usize).unwrap_or(0f32)
+    }
+
+    #[wasm_bindgen]
+    pub fn get_rupoor_probability(&self, slot: u32) -> f32 {
+        self.inner.get_rupoor_probability(slot as usize).unwrap_or(0f32)
+    }
+
+    #[wasm_bindgen]
+    pub fn get_possible_rng_values_count(&self) -> usize {
+        self.inner.get_possible_rng_values_count()
+    }
+
+    #[wasm_bindgen]
+    pub fn get_identified_loop(&self) -> Option<usize> {
+        self.inner.get_identified_loop()
+    }
+
+    #[wasm_bindgen]
+    pub fn lock_to_loop(&mut self, loop_idx: Option<usize>) {
+        self.inner.set_locked_to_loop_idx(loop_idx);
+    }
+
+    #[wasm_bindgen]
+    pub fn get_total_loop_count(&self) -> usize{
+        self.cached_boards.len()
     }
 
 
