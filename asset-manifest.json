@@ -1,25 +1,33 @@
 {
   "files": {
-    "main.css": "/thrill-digger/static/css/main.0670abdb.chunk.css",
-    "main.js": "/thrill-digger/static/js/main.2e2c90b4.chunk.js",
-    "main.js.map": "/thrill-digger/static/js/main.2e2c90b4.chunk.js.map",
-    "runtime-main.js": "/thrill-digger/static/js/runtime-main.3cafd3f2.js",
-    "runtime-main.js.map": "/thrill-digger/static/js/runtime-main.3cafd3f2.js.map",
-    "static/js/2.ddccef42.chunk.js": "/thrill-digger/static/js/2.ddccef42.chunk.js",
-    "static/js/2.ddccef42.chunk.js.map": "/thrill-digger/static/js/2.ddccef42.chunk.js.map",
-    "static/js/3.18205a27.chunk.js": "/thrill-digger/static/js/3.18205a27.chunk.js",
-    "d4e325d24f48d9308a69.module.wasm": "/thrill-digger/d4e325d24f48d9308a69.module.wasm",
-    "static/js/3.18205a27.chunk.js.map": "/thrill-digger/static/js/3.18205a27.chunk.js.map",
+    "main.css": "/thrill-digger/static/css/main.1ca73288.chunk.css",
+    "main.js": "/thrill-digger/static/js/main.9de5b274.chunk.js",
+    "main.js.map": "/thrill-digger/static/js/main.9de5b274.chunk.js.map",
+    "runtime-main.js": "/thrill-digger/static/js/runtime-main.f4c89fc5.js",
+    "runtime-main.js.map": "/thrill-digger/static/js/runtime-main.f4c89fc5.js.map",
+    "static/js/2.2c45a440.chunk.js": "/thrill-digger/static/js/2.2c45a440.chunk.js",
+    "static/js/2.2c45a440.chunk.js.map": "/thrill-digger/static/js/2.2c45a440.chunk.js.map",
+    "static/js/3.a71fffef.chunk.js": "/thrill-digger/static/js/3.a71fffef.chunk.js",
+    "c20145aaa30115ed2473.module.wasm": "/thrill-digger/c20145aaa30115ed2473.module.wasm",
+    "static/js/3.a71fffef.chunk.js.map": "/thrill-digger/static/js/3.a71fffef.chunk.js.map",
     "static/js/4.6d42f71f.chunk.js": "/thrill-digger/static/js/4.6d42f71f.chunk.js",
     "static/js/4.6d42f71f.chunk.js.map": "/thrill-digger/static/js/4.6d42f71f.chunk.js.map",
     "index.html": "/thrill-digger/index.html",
-    "static/css/main.0670abdb.chunk.css.map": "/thrill-digger/static/css/main.0670abdb.chunk.css.map",
-    "static/js/2.ddccef42.chunk.js.LICENSE.txt": "/thrill-digger/static/js/2.ddccef42.chunk.js.LICENSE.txt"
+    "static/css/main.1ca73288.chunk.css.map": "/thrill-digger/static/css/main.1ca73288.chunk.css.map",
+    "static/js/2.2c45a440.chunk.js.LICENSE.txt": "/thrill-digger/static/js/2.2c45a440.chunk.js.LICENSE.txt",
+    "static/media/BlueRupee.5b70e0f7.png": "/thrill-digger/static/media/BlueRupee.5b70e0f7.png",
+    "static/media/Bomb.3dc15ccf.png": "/thrill-digger/static/media/Bomb.3dc15ccf.png",
+    "static/media/GoldRupee.8fb25791.png": "/thrill-digger/static/media/GoldRupee.8fb25791.png",
+    "static/media/GreenRupee.7b5504b7.png": "/thrill-digger/static/media/GreenRupee.7b5504b7.png",
+    "static/media/RedRupee.863b0080.png": "/thrill-digger/static/media/RedRupee.863b0080.png",
+    "static/media/Rupoor.2f12451b.png": "/thrill-digger/static/media/Rupoor.2f12451b.png",
+    "static/media/SilverRupee.a1abe29d.png": "/thrill-digger/static/media/SilverRupee.a1abe29d.png",
+    "static/media/Unspecified.2b9ce60f.png": "/thrill-digger/static/media/Unspecified.2b9ce60f.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.3cafd3f2.js",
-    "static/js/2.ddccef42.chunk.js",
-    "static/css/main.0670abdb.chunk.css",
-    "static/js/main.2e2c90b4.chunk.js"
+    "static/js/runtime-main.f4c89fc5.js",
+    "static/js/2.2c45a440.chunk.js",
+    "static/css/main.1ca73288.chunk.css",
+    "static/js/main.9de5b274.chunk.js"
   ]
 }
