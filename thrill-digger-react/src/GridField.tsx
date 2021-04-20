@@ -1,6 +1,14 @@
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import interpolate from "color-interpolate";
 import "./GridField.css";
+import unspecified from './contents/Unspecified.png'
+import greenRupee from './contents/GreenRupee.png'
+import blueRupee from './contents/BlueRupee.png'
+import redRupee from './contents/RedRupee.png'
+import silverRupee from './contents/SilverRupee.png'
+import goldRupee from './contents/GoldRupee.png'
+import rupoor from './contents/Rupoor.png'
+import bomb from './contents/Bomb.png'
 
 export enum HoleContent {
   Unspecified = 0,
@@ -39,14 +47,35 @@ const holeStates = [
 const goodnessInterpolation = interpolate(['#2de500', '#e5d200', '#e50b00']);
 
 export class GridField extends React.Component<GridFieldProps, {}> {
+    onSelectChanges: any[];
+    contentImages: string[];
+
     constructor(props: GridFieldProps) {
         super(props);
 
-        this.onSelectChange = this.onSelectChange.bind(this);
+        this.onSelectChanges = [];
+        this.onSelectChanges[0] = this.onSelectChange.bind(this, 0);
+        this.onSelectChanges[1] = this.onSelectChange.bind(this, 1);
+        this.onSelectChanges[2] = this.onSelectChange.bind(this, 2);
+        this.onSelectChanges[3] = this.onSelectChange.bind(this, 3);
+        this.onSelectChanges[4] = this.onSelectChange.bind(this, 4);
+        this.onSelectChanges[5] = this.onSelectChange.bind(this, 5);
+        this.onSelectChanges[6] = this.onSelectChange.bind(this, 6);
+        this.onSelectChanges[7] = this.onSelectChange.bind(this, 7);
+        this.contentImages = [
+          unspecified,
+          greenRupee,
+          blueRupee,
+          redRupee,
+          silverRupee,
+          goldRupee,
+          rupoor,
+          bomb
+        ];
     }
 
-    onSelectChange(event: ChangeEvent<HTMLSelectElement>) {
-        this.props.selectionChangedCallback(this.props.index, parseInt(event.target.value));
+    onSelectChange(newSelection: number) {
+        this.props.selectionChangedCallback(this.props.index, newSelection);
     }
 
     render() {
@@ -56,11 +85,11 @@ export class GridField extends React.Component<GridFieldProps, {}> {
         <div className="grid-field" style={{backgroundColor: bgColor, borderColor: ranking < 3 ? "#0011d3": "black"}}>
           <div>hole: {index}, probability: {(bombProbability * 100).toFixed(2)}%</div>
           <div>
-            <select onChange={this.onSelectChange} value={selectedState}>
-                {holeStates.map(h => {
-                    return (<option key={h} value={h}>{holeContentToStr(h)}</option>);
-                })}
-            </select>
+              {holeStates.map((h, index) => {
+                  return (
+                    <img className="content-image" src={this.contentImages[index]} alt={holeContentToStr(h)} onClick={this.onSelectChanges[index]} width={20} />
+                  );
+              })}
           </div>
         </div>
       );
