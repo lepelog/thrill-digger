@@ -8,16 +8,8 @@ pub struct ThrillDiggerBoardSolver {
     current_board_state: Vec<HoleContent>,
     bomb_probabilities: Vec<f32>,
     rupoor_probabilities: Vec<f32>,
-    identified_loop: Option<usize>,
-    locked_to_loop_idx: Option<usize>,
+    possible_loops: [bool; BIG_LOOP_COUNT],
     possible_rng_values_count: usize,
-}
-
-
-enum IdentifiedLoopState {
-    NoneFound,
-    SingleFound(usize),
-    MultipleFound,
 }
 
 impl ThrillDiggerBoardSolver {
@@ -27,8 +19,7 @@ impl ThrillDiggerBoardSolver {
             current_board_state: vec![HoleContent::Unspecified; HoleMinigameDifficulty::Beginner.get_hole_count() as usize],
             bomb_probabilities: Vec::new(),
             rupoor_probabilities: Vec::new(),
-            identified_loop: None,
-            locked_to_loop_idx: None,
+            possible_loops: [true; BIG_LOOP_COUNT],
             possible_rng_values_count: 0,
         }
     }
@@ -39,8 +30,18 @@ impl ThrillDiggerBoardSolver {
         }
     }
 
-    pub fn reset_identified_loop(&mut self) {
-        self.identified_loop = None;
+    pub fn reset_possible_loops(&mut self) {
+        for i in self.possible_loops.iter_mut() {
+            *i = true;
+        }
+    }
+
+    pub fn get_possible_loops(&self) -> &[bool; BIG_LOOP_COUNT] {
+        &self.possible_loops
+    }
+
+    pub fn set_possible_loop(&mut self, loop_idx: u32, set_state: bool) {
+        self.possible_loops[loop_idx as usize] = set_state;
     }
 
     pub fn set_difficulty(&mut self, difficulty: &HoleMinigameDifficulty) {
@@ -107,30 +108,15 @@ impl ThrillDiggerBoardSolver {
         let mut matching_count = 0;
         let mut bomb_counts = vec![0; self.current_difficulty.get_hole_count() as usize];
         let mut rupoor_counts = vec![0; self.current_difficulty.get_hole_count() as usize];
-        let mut identified_loop = IdentifiedLoopState::NoneFound;
+        let mut found_loops = [false; BIG_LOOP_COUNT];
         for (rng_loop_idx, loop_boards) in boards.iter().enumerate() {
             // if we are locked to a loop index, skip all other loops
-            match self.locked_to_loop_idx {
-                Some(idx) => {
-                    if idx != rng_loop_idx {
-                        continue;
-                    }
-                },
-                None => {},
+            if !self.possible_loops[rng_loop_idx] {
+                continue;
             }
             for board in loop_boards.iter() {
                 if board.iter().zip(&self.current_board_state).all(|(is, should)| *should == HoleContent::Unspecified || is == should) {
-                    identified_loop = match identified_loop {
-                        IdentifiedLoopState::NoneFound => IdentifiedLoopState::SingleFound(rng_loop_idx),
-                        IdentifiedLoopState::SingleFound(last_loop_idx) => {
-                            if last_loop_idx != rng_loop_idx {
-                                IdentifiedLoopState::MultipleFound
-                            } else {
-                                IdentifiedLoopState::SingleFound(last_loop_idx)
-                            }
-                        },
-                        IdentifiedLoopState::MultipleFound => IdentifiedLoopState::MultipleFound,
-                    };
+                    found_loops[rng_loop_idx] = true;
                     matching_count += 1;
                     for (i, hole_content) in board.iter().enumerate() {
                         if *hole_content == HoleContent::Bomb {
@@ -142,12 +128,7 @@ impl ThrillDiggerBoardSolver {
                 }
             }
         }
-        match identified_loop {
-            IdentifiedLoopState::SingleFound(loop_idx) => {
-                self.identified_loop = Some(loop_idx);
-            },
-            _ => self.identified_loop = None,
-        }
+        self.possible_loops = found_loops;
         self.possible_rng_values_count = matching_count;
         for i in 0..self.current_difficulty.get_hole_count() as usize {
             self.bomb_probabilities[i] = bomb_counts[i] as f32 / matching_count as f32;
@@ -178,10 +159,6 @@ impl ThrillDiggerBoardSolver {
         out
     }
 
-    pub fn set_locked_to_loop_idx(&mut self, loop_idx: Option<usize>) {
-        self.locked_to_loop_idx = loop_idx;
-    }
-
     pub fn get_bomb_probability(&self, slot: usize) -> Option<f32> {
         self.bomb_probabilities.get(slot).copied()
     }
@@ -194,11 +171,11 @@ impl ThrillDiggerBoardSolver {
         self.possible_rng_values_count
     }
 
-    pub fn get_identified_loop(&self) -> Option<usize> {
-        self.identified_loop
-    }
-
     pub fn get_difficulty(&self) -> &HoleMinigameDifficulty {
         &self.current_difficulty
+    }
+
+    pub fn get_probabilities(&self) -> &Vec<f32> {
+        &self.bomb_probabilities
     }
 }

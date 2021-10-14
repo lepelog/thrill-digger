@@ -121,13 +121,14 @@ impl HoleMinigame {
         self.place_rupoors(rng);
         let mut bad_pattern = false;
         // check if there is a 2x2 group of "bad stuff" aka bombs and rupoors
-        for i in 0..(self.board_height - 1) {
+        'outer: for i in 0..(self.board_height - 1) {
             for j in 0..(self.board_width - 1) {
                 if self.is_bomb_or_rupoor(i * self.board_width + j) &&
                 self.is_bomb_or_rupoor(i * self.board_width + j + 1) &&
                 self.is_bomb_or_rupoor((i + 1) * self.board_width + j) &&
                 self.is_bomb_or_rupoor((i + 1) * self.board_width + j + 1) {
                     bad_pattern = true;
+                    break 'outer;
                 }
             }
         }

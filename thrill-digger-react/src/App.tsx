@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { SolverWrapper } from "./native/build";
 import { GridField, HoleContent } from "./GridField";
@@ -18,7 +17,7 @@ type AppState = {
   cellStates: CellState[],
   boardWidth: number,
   boardHeight: number,
-  identifiedLoop: number | undefined,
+  possibleLoops: boolean[],
   matchingSeedCount: number,
 };
 
@@ -33,7 +32,7 @@ class TestComp extends React.Component<{}, AppState> {
       cellStates: [{bombPercentage: 0, rupoorPercentage: 0, selectedType: HoleContent.Unspecified, ranking: 100}],
       boardHeight: 0,
       boardWidth: 0,
-      identifiedLoop: undefined,
+      possibleLoops: [],
       matchingSeedCount: -1,
     };
 
@@ -117,8 +116,28 @@ class TestComp extends React.Component<{}, AppState> {
     this.setState({
       cellStates,
       matchingSeedCount: solver.get_possible_rng_values_count(),
-      identifiedLoop: solver.get_identified_loop(),
+      possibleLoops: this.getPossibleLoopArray(solver),
     });
+  }
+
+  getPossibleLoopArray(solver: SolverWrapper): boolean[] {
+    let loop_array = new Uint8Array(9);
+    solver.get_possible_loops(loop_array);
+    let our_arr: boolean[] = [];
+    loop_array.forEach((val, idx) => {
+      our_arr.push(val === 1);
+    });
+    return our_arr;
+  }
+
+  resetPossibleLoopArray() {
+    this.getSolverOrError().reset_possible_loops();
+    this.updateBoardAndRecalculateProbs(this.state.cellStates);
+  }
+
+  setPossibleLoop(idx: number, state: boolean) {
+    this.getSolverOrError().set_possible_loop(idx, state);
+    this.updateBoardAndRecalculateProbs(this.state.cellStates);
   }
 
   resetBoard() {
@@ -140,13 +159,16 @@ class TestComp extends React.Component<{}, AppState> {
   }
 
   render() {
-    const {boardHeight, boardWidth, cellStates, currentMessage, matchingSeedCount, identifiedLoop} = this.state;
+    const {boardHeight, boardWidth, cellStates, currentMessage, matchingSeedCount, possibleLoops} = this.state;
     return (
       <div className="App">
       <h1>Thrill Digger Expert solver</h1>
         <div>{currentMessage}</div>
         <div>matching seeds: {matchingSeedCount}</div>
-        <div>identified loop: {identifiedLoop}</div>
+        <div>Possible Loops: {possibleLoops.map((val, idx) => {
+          return (<span><input type="checkbox" checked={val} onChange={e => this.setPossibleLoop(idx, e.target.checked)}/>{idx}</span>);
+        })}</div>
+        <div><button onClick={this.resetPossibleLoopArray.bind(this)}>Reset Loops</button></div>
         <table>
           <tbody>
             {

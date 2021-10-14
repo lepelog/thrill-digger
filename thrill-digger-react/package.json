@@ -24,7 +24,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "build-native-release": "wasm-pack build ./src/native --target bundler --out-dir ./src/native/build --release",
+    "build-native-release": "wasm-pack build ./src/native --target bundler --out-dir build --release",
     "deploy": "gh-pages -b gh-pages -d build"
   },
   "eslintConfig": {

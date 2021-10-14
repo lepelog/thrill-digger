@@ -49,6 +49,8 @@ impl RngContext {
     }
 }
 
+pub const BIG_LOOP_COUNT: usize = 9;
+
 pub const ALL_RNG_LOOPS: &[(u32, u32)] = &[
 (1580047903,1708724),
 (2676992563,354835),

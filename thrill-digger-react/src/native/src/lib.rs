@@ -9,7 +9,7 @@ use num_traits::FromPrimitive;
 extern crate ss_rng;
 use ss_rng::solver::ThrillDiggerBoardSolver;
 use ss_rng::thrill_digger::*;
-use ss_rng::rng::{ALL_RNG_LOOPS, RngContext};
+use ss_rng::rng::{ALL_RNG_LOOPS, RngContext, BIG_LOOP_COUNT};
 
 #[wasm_bindgen]
 pub struct SolverWrapper {
@@ -58,15 +58,25 @@ impl SolverWrapper {
     pub fn get_possible_rng_values_count(&self) -> usize {
         self.inner.get_possible_rng_values_count()
     }
-
+    
     #[wasm_bindgen]
-    pub fn get_identified_loop(&self) -> Option<usize> {
-        self.inner.get_identified_loop()
+    pub fn reset_possible_loops(&mut self) {
+        self.inner.reset_possible_loops();
     }
 
     #[wasm_bindgen]
-    pub fn lock_to_loop(&mut self, loop_idx: Option<usize>) {
-        self.inner.set_locked_to_loop_idx(loop_idx);
+    pub fn get_possible_loops(&self, possible_loops_out: &mut [u8]) -> Result<(), JsValue> {
+        if possible_loops_out.len() != BIG_LOOP_COUNT {
+            return Err(JsValue::from_str("array with invalid sized passed in!"));
+        }
+        for i in 0..BIG_LOOP_COUNT {
+            possible_loops_out[i] = if self.inner.get_possible_loops()[i] {1} else {0};
+        }
+        return Ok(());
+    }
+
+    pub fn set_possible_loop(&mut self, loop_idx: u32, set_possible: bool) {
+        self.inner.set_possible_loop(loop_idx, set_possible);
     }
 
     #[wasm_bindgen]
