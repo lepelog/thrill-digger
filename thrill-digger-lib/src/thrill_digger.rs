@@ -1,6 +1,6 @@
 use crate::rng::*;
 
-#[derive(PartialEq, Clone, Copy, FromPrimitive, ToPrimitive, Debug)]
+#[derive(PartialEq, Eq, std::hash::Hash, Clone, Copy, FromPrimitive, ToPrimitive, Debug)]
 pub enum HoleContent {
     Unspecified = 0,
     GreenRupee,

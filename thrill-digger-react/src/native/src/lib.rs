@@ -7,22 +7,17 @@ extern crate num_traits;
 use num_traits::FromPrimitive;
 
 extern crate ss_rng;
-use ss_rng::rng::{RngContext, ALL_RNG_LOOPS, BIG_LOOP_COUNT};
-use ss_rng::solver::ThrillDiggerBoardSolver;
-use ss_rng::thrill_digger::*;
+use ss_rng::rng::{RngContext, BIG_LOOP_COUNT};
+use ss_rng::solver::ThrillDiggerExpertSolver;
 
 #[wasm_bindgen]
 pub struct SolverWrapper {
-    inner: ThrillDiggerBoardSolver,
-    cached_boards: Vec<Vec<[HoleContent; 40]>>,
+    inner: ThrillDiggerExpertSolver,
 }
 
-impl From<ThrillDiggerBoardSolver> for SolverWrapper {
-    fn from(inner: ThrillDiggerBoardSolver) -> SolverWrapper {
-        SolverWrapper {
-            inner,
-            cached_boards: Vec::new(),
-        }
+impl From<ThrillDiggerExpertSolver> for SolverWrapper {
+    fn from(inner: ThrillDiggerExpertSolver) -> SolverWrapper {
+        SolverWrapper { inner }
     }
 }
 
@@ -30,7 +25,7 @@ impl From<ThrillDiggerBoardSolver> for SolverWrapper {
 impl SolverWrapper {
     #[wasm_bindgen]
     pub fn set_hole(&mut self, hole: u32, content: u32) -> Result<(), JsValue> {
-        self.inner.set_hole(
+        self.inner.input.set_hole(
             hole as usize,
             FromPrimitive::from_u32(content).ok_or(JsValue::from("not a valid content!"))?,
         );
@@ -44,32 +39,42 @@ impl SolverWrapper {
 
     #[wasm_bindgen]
     pub fn calculate_probabilities_with_pregenerated(&mut self) {
-        self.inner
-            .calculate_probabilities_with_pregenerated(&self.cached_boards)
+        self.inner.calc_update();
     }
 
     #[wasm_bindgen]
     pub fn get_probability(&self, slot: u32) -> f32 {
         self.inner
-            .get_bomb_probability(slot as usize)
+            .output
+            .bomb_probabilities
+            .get(slot as usize)
+            .copied()
             .unwrap_or(0f32)
     }
 
     #[wasm_bindgen]
     pub fn get_rupoor_probability(&self, slot: u32) -> f32 {
         self.inner
-            .get_rupoor_probability(slot as usize)
+            .output
+            .rupoor_probabilities
+            .get(slot as usize)
+            .copied()
             .unwrap_or(0f32)
     }
 
     #[wasm_bindgen]
     pub fn get_possible_rng_values_count(&self) -> usize {
-        self.inner.get_possible_rng_values_count()
+        self.inner.output.possible_rng_values_count
     }
 
     #[wasm_bindgen]
     pub fn reset_possible_loops(&mut self) {
-        self.inner.reset_possible_loops();
+        self.inner.input.clear_selected_loops();
+    }
+
+    #[wasm_bindgen]
+    pub fn set_possible_loop(&mut self, loop_idx: u32, set_possible: bool) {
+        self.inner.input.set_loop(loop_idx as usize, set_possible);
     }
 
     #[wasm_bindgen]
@@ -78,61 +83,42 @@ impl SolverWrapper {
             return Err(JsValue::from_str("array with invalid sized passed in!"));
         }
         for i in 0..BIG_LOOP_COUNT {
-            possible_loops_out[i] = self.inner.get_possible_loops()[i].into();
+            possible_loops_out[i] = self.inner.output.possible_loops[i].into();
         }
         return Ok(());
     }
 
-    pub fn set_possible_loop(&mut self, loop_idx: u32, set_possible: bool) {
-        self.inner.set_possible_loop(loop_idx, set_possible);
-    }
-
     #[wasm_bindgen]
     pub fn get_total_loop_count(&self) -> usize {
-        self.cached_boards.len()
+        self.inner.cached_boards.len()
     }
 
     #[wasm_bindgen]
     pub fn cache_boards(&mut self) {
-        self.cached_boards.clear();
-        for &(seed, period) in ALL_RNG_LOOPS.iter().filter(|(_, period)| *period > 8) {
-            let mut current_boards = vec![[HoleContent::Unspecified; 40]; period as usize];
-            let mut rng = RngContext::from_state(seed);
-            for board in current_boards.iter_mut() {
-                ExpertHoleMinigame::generate(&mut rng.clone(), board);
-                rng.next_u32();
-            }
-            self.cached_boards.push(current_boards);
-        }
+        self.inner.cache_boards();
     }
 
+    // for speed/memory reasons only expert currently
+    // maybe refactor later
     #[wasm_bindgen]
     pub fn get_width(&self) -> isize {
-        self.inner.get_difficulty().get_board_width()
+        8
     }
 
     #[wasm_bindgen]
     pub fn get_height(&self) -> isize {
-        self.inner.get_difficulty().get_board_height()
+        5
     }
 
     #[wasm_bindgen]
     pub fn get_hole_count(&self) -> isize {
-        self.inner.get_difficulty().get_hole_count()
+        40
     }
 }
 
 #[wasm_bindgen]
-pub fn create_solver(difficulty: u32) -> Result<SolverWrapper, JsValue> {
-    let parsed_dif = match difficulty {
-        0 => HoleMinigameDifficulty::Beginner,
-        1 => HoleMinigameDifficulty::Intermediate,
-        2 => HoleMinigameDifficulty::Expert,
-        _ => return Err(JsValue::from_str("invalid difficulty!")),
-    };
-    let mut solver = ThrillDiggerBoardSolver::new();
-    solver.set_difficulty(&parsed_dif);
-    return Ok(solver.into());
+pub fn create_solver() -> Result<SolverWrapper, JsValue> {
+    return Ok(ThrillDiggerExpertSolver::new().into());
 }
 
 // #[wasm_bindgen]

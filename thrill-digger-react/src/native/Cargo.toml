@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["lepelog <lepelog4@gmail.com>"]
 edition = "2018"
 
+[package.metadata.wasm-pack.profile.release]
+# until it stops crashing
+wasm-opt = false
+
 [lib]
 crate-type = ["cdylib"]
 

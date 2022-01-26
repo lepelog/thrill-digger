@@ -44,7 +44,7 @@ class TestComp extends React.Component<{}, AppState> {
       this.setState({
         nativeModule: native,
         currentMessage: "computing values...",
-        solver: native.create_solver(2/* expert */),
+        solver: native.create_solver(),
       });
       setImmediate(() => {
         console.log("setting state");
