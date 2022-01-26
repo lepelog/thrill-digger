@@ -132,7 +132,12 @@ pub fn calculate_probabilities_with_pregenerated_cached(
         Some(out) => output.clone_from(out),
         None => {
             calculate_probabilities_with_pregenerated(boards, input, output);
-            cache.put(input.clone(), output.clone());
+            // if the number of possible seeds is low enough, the benefit from
+            // cache doesn't matter that much, prefer keeping states with
+            // a lot of possible seeds in the cache
+            if output.possible_rng_values_count > 10000 {
+                cache.put(input.clone(), output.clone());
+            }
         }
     }
 }
