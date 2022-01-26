@@ -45,7 +45,11 @@ const holeStates = [
   HoleContent.Bomb,
 ];
 
-const goodnessInterpolation = interpolate(['#2de500', '#e5d200', '#e50b00']);
+const SAFEST_COLOR = '#53fc05';
+const ALMOST_SAFEST_COLOR = '#349b04';
+
+const firstTierInterpolation = interpolate([SAFEST_COLOR, ALMOST_SAFEST_COLOR]);
+const secondTierInterpolation = interpolate(['#fcf80c', '#a30800']);
 
 export class GridField extends React.Component<GridFieldProps, {}> {
     contentImages: string[];
@@ -68,11 +72,30 @@ export class GridField extends React.Component<GridFieldProps, {}> {
         this.props.selectionChangedCallback(this.props.index, newSelection);
     }
 
+    getBgColor(rank: number, bombProbability: number, rupoorProbability: number): string {
+      if (!isFinite(bombProbability)) {
+        return "unset";
+      }
+      if (bombProbability === 0) {
+        if (rupoorProbability === 0) {
+          return SAFEST_COLOR;
+        } else {
+          return ALMOST_SAFEST_COLOR;
+        }
+      }
+      const GOOD_RANK_COUNT = 4;
+      if (rank < GOOD_RANK_COUNT) {
+        return firstTierInterpolation(rank / GOOD_RANK_COUNT);
+      } else {
+        return secondTierInterpolation(bombProbability);
+      }
+    }
+
     render() {
       const {bombProbability, rupoorProbability, selectedState, ranking} = this.props;
-      const bgColor = selectedState === HoleContent.Unspecified ? goodnessInterpolation(isFinite(bombProbability) ? bombProbability : 0) : "unset";
+      const bgColor = selectedState === HoleContent.Unspecified ? this.getBgColor(ranking, bombProbability, rupoorProbability) : "unset";
       return (
-        <div className="grid-field" style={{backgroundColor: bgColor, borderColor: ranking < 3 ? "#0011d3": "black"}}>
+        <div className="grid-field" style={{backgroundColor: bgColor}}>
           <div>bomb probability: {(bombProbability * 100).toFixed(2)}%</div>
           <div>rupoor probability: {(rupoorProbability * 100).toFixed(2)}%</div>
           <div>
