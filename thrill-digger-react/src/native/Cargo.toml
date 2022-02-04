@@ -2,7 +2,7 @@
 name = "thrill-digger-wasm"
 version = "0.1.0"
 authors = ["lepelog <lepelog4@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [package.metadata.wasm-pack.profile.release]
 # until it stops crashing
