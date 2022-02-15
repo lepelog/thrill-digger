@@ -3,10 +3,10 @@ use std::hash::Hash;
 use crate::rng::*;
 use crate::thrill_digger::*;
 
-#[derive(PartialEq, Eq, Hash, Clone)]
+#[derive(PartialEq, Eq, Hash, Clone, Debug)]
 pub struct ExpertSolverInput {
-    current_board_state: [HoleContent; 40],
-    selected_loops: [bool; BIG_LOOP_COUNT],
+    pub current_board_state: [HoleContent; 40],
+    pub selected_loops: [bool; BIG_LOOP_COUNT],
 }
 
 impl Default for ExpertSolverInput {
@@ -55,7 +55,7 @@ impl ExpertSolverInput {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ExpertSolverOutput {
     pub bomb_probabilities: [f32; 40],
     pub rupoor_probabilities: [f32; 40],
@@ -77,7 +77,7 @@ impl Default for ExpertSolverOutput {
 impl ExpertSolverOutput {
     pub fn clear_possible_loops(&mut self) {
         for lop in self.possible_loops.iter_mut() {
-            *lop = false;
+            *lop = true;
         }
     }
 }
