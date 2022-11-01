@@ -26,8 +26,7 @@ function holeContentToStr(hc: HoleContent): string {
 }
 
 type GridFieldProps = {
-    bombProbability: number,
-    rupoorProbability: number,
+    probabilities: number[],
     selectedState: HoleContent,
     index: number,
     selectionChangedCallback: (index: number, newSelected: HoleContent) => void,
@@ -92,7 +91,9 @@ export class GridField extends React.Component<GridFieldProps, {}> {
     }
 
     render() {
-      const {bombProbability, rupoorProbability, selectedState, ranking} = this.props;
+      const {probabilities, selectedState, ranking} = this.props;
+      const bombProbability = probabilities[HoleContent.Bomb];
+      const rupoorProbability = probabilities[HoleContent.Rupoor];
       const bgColor = selectedState === HoleContent.Unspecified ? this.getBgColor(ranking, bombProbability, rupoorProbability) : "unset";
       return (
         <div className="grid-field" style={{backgroundColor: bgColor}}>
@@ -100,9 +101,13 @@ export class GridField extends React.Component<GridFieldProps, {}> {
           <div>rupoor probability: {(rupoorProbability * 100).toFixed(2)}%</div>
           <div>
               {holeStates.map((h, index) => {
+                if (probabilities[index] == 0) {
+                  return null;
+                } else {
                   return (
                     <img key={index} className={(index === selectedState ? "content-image-highlighted " : "") + "content-image"} src={this.contentImages[index]} alt={holeContentToStr(h)} onClick={this.onSelectChange.bind(this, index)} width={20} />
                   );
+                }
               })}
           </div>
         </div>

@@ -4,8 +4,8 @@ import { SolverWrapper } from "./native/build";
 import { GridField, HoleContent } from "./GridField";
 
 type CellState = {
-  bombPercentage: number,
-  rupoorPercentage: number,
+  // indexed by HoleContent
+  probabilities: number[]
   selectedType: HoleContent,
   ranking: number,
 };
@@ -29,7 +29,7 @@ class TestComp extends React.Component<{}, AppState> {
       nativeModule: null,
       currentMessage: "waiting to initialize...",
       solver: null,
-      cellStates: [{bombPercentage: 0, rupoorPercentage: 0, selectedType: HoleContent.Unspecified, ranking: 100}],
+      cellStates: [{probabilities: new Array(8).fill(0), selectedType: HoleContent.Unspecified, ranking: 100}],
       boardHeight: 0,
       boardWidth: 0,
       possibleLoops: [],
@@ -55,8 +55,7 @@ class TestComp extends React.Component<{}, AppState> {
         const boardWidth = this.state.solver!.get_width();
         const newStates = Array(boardHeight * boardWidth).fill(0).map(() => {
           return {
-            bombPercentage: 0,
-            rupoorPercentage: 0,
+            probabilities: new Array(8).fill(0),
             selectedType: HoleContent.Unspecified,
             ranking: 100,
           }
@@ -85,6 +84,9 @@ class TestComp extends React.Component<{}, AppState> {
 
   selectedChanged(index: number, selection: HoleContent) {
     const cellStates = this.state.cellStates;
+    if (cellStates[index].selectedType == selection) {
+      selection = HoleContent.Unspecified;
+    }
     cellStates[index].selectedType = selection;
     const solver = this.getSolverOrError();
     solver.set_hole(index, selection);
@@ -96,16 +98,16 @@ class TestComp extends React.Component<{}, AppState> {
     const solver = this.getSolverOrError();
     solver.calculate_probabilities_with_pregenerated();
     cellStates.forEach((cellState, index) => {
-      cellState.bombPercentage = solver.get_probability(index);
-      // cellState.rupoorPercentage = solver.get_rupoor_probability(index);
-      cellState.rupoorPercentage = solver.get_rupoor_probability(index);
+      cellState.probabilities.forEach((_, i) => {
+        cellState.probabilities[i] = solver.get_a_probability(index, i);
+      });
     });
     // figure out the best places for the ranking, don't include already placed
     const cellStatesWithIndex: [number, CellState][] = cellStates
       .filter(cs => cs.selectedType === HoleContent.Unspecified)
       .map((CellState, index) => [index, CellState]);
     // first sort by bomb probability, then by rupoor probability
-    cellStatesWithIndex.sort((a,b) => a[1].bombPercentage - b[1].bombPercentage || a[1].rupoorPercentage - b[1].rupoorPercentage);
+    cellStatesWithIndex.sort((a,b) => a[1].probabilities[HoleContent.Bomb] - b[1].probabilities[HoleContent.Bomb] || a[1].probabilities[HoleContent.Rupoor] - b[1].probabilities[HoleContent.Rupoor]);
     cellStatesWithIndex.forEach(([_, CellState], index) => CellState.ranking = index);
     // make all cells, that are already dug up have no ranking
     cellStates.forEach(cs => {
@@ -145,8 +147,7 @@ class TestComp extends React.Component<{}, AppState> {
     const boardWidth = this.state.solver?.get_width() || 0;
     const cellStates = Array(boardHeight * boardWidth).fill(0).map(() => {
       return {
-        bombPercentage: 0,
-        rupoorPercentage: 0,
+        probabilities: new Array(8).fill(0),
         selectedType: HoleContent.Unspecified,
         ranking: 100,
       }
@@ -180,8 +181,7 @@ class TestComp extends React.Component<{}, AppState> {
                       const cellState = cellStates[index];
                       return (<td><GridField
                         key={index}
-                        bombProbability={cellState.bombPercentage}
-                        rupoorProbability={cellState.rupoorPercentage}
+                        probabilities={cellState.probabilities}
                         selectedState={cellState.selectedType}
                         index={index}
                         selectionChangedCallback={this.selectedChanged}

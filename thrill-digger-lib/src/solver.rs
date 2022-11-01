@@ -57,8 +57,7 @@ impl ExpertSolverInput {
 
 #[derive(Clone, Debug)]
 pub struct ExpertSolverOutput {
-    pub bomb_probabilities: [f32; 40],
-    pub rupoor_probabilities: [f32; 40],
+    pub all_probabilities: [[f32; 8]; 40],
     pub possible_loops: [bool; BIG_LOOP_COUNT],
     pub possible_rng_values_count: usize,
 }
@@ -66,8 +65,7 @@ pub struct ExpertSolverOutput {
 impl Default for ExpertSolverOutput {
     fn default() -> Self {
         ExpertSolverOutput {
-            bomb_probabilities: [0f32; 40],
-            rupoor_probabilities: [0f32; 40],
+            all_probabilities: [[0f32; 8]; 40],
             possible_loops: [false; BIG_LOOP_COUNT],
             possible_rng_values_count: 0,
         }
@@ -88,8 +86,7 @@ pub fn calculate_probabilities_with_pregenerated(
     output: &mut ExpertSolverOutput,
 ) {
     let mut matching_count = 0usize;
-    let mut bomb_counts = [0usize; 40];
-    let mut rupoor_counts = [0usize; 40];
+    let mut all_counts = [[0usize; 8]; 40];
     output.clear_possible_loops();
     for (rng_loop_idx, loop_boards) in boards.iter().enumerate() {
         // if we are locked to a loop index, skip all other loops
@@ -105,20 +102,17 @@ pub fn calculate_probabilities_with_pregenerated(
                 output.possible_loops[rng_loop_idx] = true;
                 // we know we can't overflow over u32
                 matching_count = matching_count.wrapping_add(1);
-                for (i, hole_content) in board.iter().enumerate() {
-                    if *hole_content == HoleContent::Bomb {
-                        bomb_counts[i] = bomb_counts[i].wrapping_add(1);
-                    } else if *hole_content == HoleContent::Rupoor {
-                        rupoor_counts[i] = rupoor_counts[i].wrapping_add(1);
-                    }
+                for (counts, hole_content) in all_counts.iter_mut().zip(board.iter()) {
+                    counts[*hole_content as usize] = counts[*hole_content as usize].wrapping_add(1);
                 }
             }
         }
     }
     output.possible_rng_values_count = matching_count;
     for i in 0..40 as usize {
-        output.bomb_probabilities[i] = bomb_counts[i] as f32 / matching_count as f32;
-        output.rupoor_probabilities[i] = rupoor_counts[i] as f32 / matching_count as f32;
+        for j in 1..8 as usize {
+            output.all_probabilities[i][j] = all_counts[i][j] as f32 / matching_count as f32;
+        }
     }
 }
 

@@ -41,23 +41,15 @@ impl SolverWrapper {
     pub fn calculate_probabilities_with_pregenerated(&mut self) {
         self.inner.calc_update();
     }
-
-    #[wasm_bindgen]
-    pub fn get_probability(&self, slot: u32) -> f32 {
+    
+    pub fn get_a_probability(&self, slot: u32, typ: u32) -> f32 {
         self.inner
             .output
-            .bomb_probabilities
+            .all_probabilities
             .get(slot as usize)
-            .copied()
-            .unwrap_or(0f32)
-    }
-
-    #[wasm_bindgen]
-    pub fn get_rupoor_probability(&self, slot: u32) -> f32 {
-        self.inner
-            .output
-            .rupoor_probabilities
-            .get(slot as usize)
+            .and_then(|counts| {
+                counts.get(typ as usize)
+            })
             .copied()
             .unwrap_or(0f32)
     }
