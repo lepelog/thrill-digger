@@ -101,7 +101,7 @@ export class GridField extends React.Component<GridFieldProps, {}> {
           <div>rupoor probability: {(rupoorProbability * 100).toFixed(2)}%</div>
           <div>
               {holeStates.map((h, index) => {
-                if (probabilities[index] == 0) {
+                if (probabilities[index] === 0) {
                   return null;
                 } else {
                   return (

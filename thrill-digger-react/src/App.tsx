@@ -84,7 +84,7 @@ class TestComp extends React.Component<{}, AppState> {
 
   selectedChanged(index: number, selection: HoleContent) {
     const cellStates = this.state.cellStates;
-    if (cellStates[index].selectedType == selection) {
+    if (cellStates[index].selectedType === selection) {
       selection = HoleContent.Unspecified;
     }
     cellStates[index].selectedType = selection;
@@ -167,7 +167,7 @@ class TestComp extends React.Component<{}, AppState> {
         <div>{currentMessage}</div>
         <div>matching seeds: {matchingSeedCount}</div>
         <div>Possible Loops: {possibleLoops.map((val, idx) => {
-          return (<span><input type="checkbox" checked={val} onChange={e => this.setPossibleLoop(idx, e.target.checked)}/>{idx}</span>);
+          return (<span key={idx}><input type="checkbox" checked={val} onChange={e => this.setPossibleLoop(idx, e.target.checked)}/>{idx}</span>);
         })}</div>
         <div><button onClick={this.resetPossibleLoopArray.bind(this)}>Reset Loops</button></div>
         <table>
