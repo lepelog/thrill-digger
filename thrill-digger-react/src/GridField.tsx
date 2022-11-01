@@ -1,14 +1,14 @@
 import React from 'react';
 import interpolate from "color-interpolate";
 import "./GridField.css";
-import unspecified from './contents/Unspecified.png'
-import greenRupee from './contents/GreenRupee.png'
-import blueRupee from './contents/BlueRupee.png'
-import redRupee from './contents/RedRupee.png'
-import silverRupee from './contents/SilverRupee.png'
-import goldRupee from './contents/GoldRupee.png'
-import rupoor from './contents/Rupoor.png'
-import bomb from './contents/Bomb.png'
+import unspecified from './contents/Unspecified.webp'
+import greenRupee from './contents/GreenRupee.webp'
+import blueRupee from './contents/BlueRupee.webp'
+import redRupee from './contents/RedRupee.webp'
+import silverRupee from './contents/SilverRupee.webp'
+import goldRupee from './contents/GoldRupee.webp'
+import rupoor from './contents/Rupoor.webp'
+import bomb from './contents/Bomb.webp'
 
 export enum HoleContent {
   Unspecified = 0,
