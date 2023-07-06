@@ -1,3 +1,4 @@
+use ss_rng::thrill_digger::HoleContent;
 use wasm_bindgen::prelude::*;
 
 extern crate num_traits;
@@ -38,15 +39,13 @@ impl SolverWrapper {
     pub fn calculate_probabilities_with_pregenerated(&mut self) {
         self.inner.calc_update();
     }
-    
+
     pub fn get_a_probability(&self, slot: u32, typ: u32) -> f32 {
         self.inner
             .output
             .all_probabilities
             .get(slot as usize)
-            .and_then(|counts| {
-                counts.get(typ as usize)
-            })
+            .and_then(|counts| counts.get(typ as usize))
             .copied()
             .unwrap_or(0f32)
     }
@@ -102,6 +101,31 @@ impl SolverWrapper {
     #[wasm_bindgen]
     pub fn get_hole_count(&self) -> isize {
         40
+    }
+
+    #[wasm_bindgen]
+    pub fn get_input_board_state_ptr(&mut self) -> *mut HoleContent {
+        self.inner.input.current_board_state.as_mut_ptr()
+    }
+
+    #[wasm_bindgen]
+    pub fn get_input_selected_loops_ptr(&mut self) -> *mut bool {
+        self.inner.input.selected_loops.as_mut_ptr()
+    }
+
+    #[wasm_bindgen]
+    pub fn get_output_possible_loops_ptr(&self) -> *const bool {
+        self.inner.output.possible_loops.as_ptr()
+    }
+
+    #[wasm_bindgen]
+    pub fn get_output_probabilities_ptr(&self) -> *const f32 {
+        self.inner.output.all_probabilities.as_ptr() as *const f32
+    }
+
+    #[wasm_bindgen]
+    pub fn get_output_ranks_ptr(&self) -> *const u8 {
+        self.inner.output.ranks.as_ptr()
     }
 }
 

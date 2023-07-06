@@ -91,7 +91,8 @@ pub fn do_test() {
             }
             for (slot, hole) in solver.input.current_board_state.iter().enumerate() {
                 if *hole == HoleContent::Unspecified {
-                    let bomb_prob = solver.output.all_probabilities[HoleContent::Bomb as usize][slot];
+                    let bomb_prob =
+                        solver.output.all_probabilities[HoleContent::Bomb as usize][slot];
                     if bomb_prob < min_bomb {
                         if true {
                             selected_slot = Some(slot);

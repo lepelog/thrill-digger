@@ -1,0 +1,2 @@
+[workspace]
+members = ["thrill-digger-cmd", "thrill-digger-lib", "thrill-digger-svelte/native"]

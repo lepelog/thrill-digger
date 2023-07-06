@@ -61,6 +61,7 @@ pub struct ExpertSolverOutput {
     pub all_probabilities: [[f32; 8]; 40],
     pub possible_loops: [bool; BIG_LOOP_COUNT],
     pub possible_rng_values_count: usize,
+    pub ranks: [u8; 40],
 }
 
 impl Default for ExpertSolverOutput {
@@ -69,6 +70,7 @@ impl Default for ExpertSolverOutput {
             all_probabilities: [[0f32; 8]; 40],
             possible_loops: [false; BIG_LOOP_COUNT],
             possible_rng_values_count: 0,
+            ranks: [0; 40],
         }
     }
 }
@@ -76,7 +78,7 @@ impl Default for ExpertSolverOutput {
 impl ExpertSolverOutput {
     pub fn clear_possible_loops(&mut self) {
         for lop in self.possible_loops.iter_mut() {
-            *lop = true;
+            *lop = false;
         }
     }
 }
@@ -114,6 +116,38 @@ pub fn calculate_probabilities_with_pregenerated(
         for j in 1..8 as usize {
             output.all_probabilities[i][j] = all_counts[i][j] as f32 / matching_count as f32;
         }
+    }
+    // ranking
+    // we set all already checked roles to rank 100
+    for (rank, content) in output
+        .ranks
+        .iter_mut()
+        .zip(input.current_board_state.iter())
+    {
+        if *content == HoleContent::Unspecified {
+            *rank = 0;
+        } else {
+            *rank = 100;
+        }
+    }
+    // then we can ignore everything with rank 100 here
+    let mut prob_and_ranks: Vec<_> = output
+        .all_probabilities
+        .iter()
+        .zip(output.ranks.iter_mut())
+        .filter(|(_, rank)| **rank != 100)
+        .collect();
+    // sort, so that the lowest probabilities are first
+    prob_and_ranks.sort_unstable_by(|(a, _), (b, _)| {
+        a[HoleContent::Bomb as usize]
+            .total_cmp(&b[HoleContent::Bomb as usize])
+            .then_with(|| {
+                a[HoleContent::Rupoor as usize].total_cmp(&b[HoleContent::Rupoor as usize])
+            })
+    });
+    // now we can write the ranks in the rank array
+    for (index, (_, rank)) in prob_and_ranks.iter_mut().enumerate() {
+        **rank = index as u8;
     }
 }
 
