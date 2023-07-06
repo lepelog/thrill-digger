@@ -16,7 +16,6 @@ wasm-bindgen = "0.2.78"
 ss-rng = {path = "../../../thrill-digger-lib"}
 num-traits = "0.2"
 num-derive = "0.3"
-wee_alloc = "0.4.5"
 
 [profile.release]
 lto = true

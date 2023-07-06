@@ -1,4 +1,5 @@
 use std::hash::Hash;
+use std::num::NonZeroUsize;
 
 use crate::rng::*;
 use crate::thrill_digger::*;
@@ -147,7 +148,7 @@ impl ThrillDiggerExpertSolver {
     pub fn new() -> Self {
         ThrillDiggerExpertSolver {
             cached_boards: Vec::with_capacity(BIG_LOOP_COUNT),
-            cache: lru::LruCache::new(100),
+            cache: lru::LruCache::new(NonZeroUsize::new(100).unwrap()),
             input: ExpertSolverInput::default(),
             output: ExpertSolverOutput::default(),
         }

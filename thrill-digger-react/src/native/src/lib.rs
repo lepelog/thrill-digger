@@ -1,8 +1,5 @@
 use wasm_bindgen::prelude::*;
 
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
 extern crate num_traits;
 use num_traits::FromPrimitive;
 
