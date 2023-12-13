@@ -15,5 +15,5 @@ edition = "2021"
 [dependencies]
 num-traits = "0.2"
 num-derive = "0.4"
-lru = "0.10"
+lru = "0.12"
 serde = { version = "1.0.166", features = ["derive"] }

@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 ss-rng = {path = "../thrill-digger-lib"}
 num-traits = "0.2"
-num-derive = "0.3"
+num-derive = "0.4"
 rand = "0.8.5"
 
 [profile.release]
