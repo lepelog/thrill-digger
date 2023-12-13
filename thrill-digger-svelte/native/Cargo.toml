@@ -5,8 +5,8 @@ authors = ["lepelog <lepelog4@gmail.com>"]
 edition = "2021"
 
 [package.metadata.wasm-pack.profile.release]
-# until it stops crashing
-wasm-opt = false
+# disable again if it crashes
+wasm-opt = true
 
 [lib]
 crate-type = ["cdylib"]
